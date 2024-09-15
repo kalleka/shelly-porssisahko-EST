@@ -174,6 +174,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Versio 2 julkaistu (tehty täysin uusiksi)
 
 # In English
+## [0.1.0-2.13.0] 09.09.2024
+- Fetch price info from "EE" zone
+- Tariffs timing (day, night, weekday) according to the Elektrilevi. If VAT is defined then it is added both to electricity prices and tariffs.
+- New prices are fetched after the 18:00. A random delay 0-15 min delay is added to prevent all the clients sending request to Elektrilevi server at the same time
+- User interface translated to Estonian
+  
 ## [2.13.0] - 14.07.2024
 - When day changes, the price data is always updated ([See issue #26](https://github.com/jisotalo/shelly-porssisahko/issues/26))
   - Before the already known prices were used 
