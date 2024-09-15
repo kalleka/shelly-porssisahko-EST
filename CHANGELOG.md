@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+# 
+## [0.1.0-2.13.0] 27.08.2024
+- Hinnainfo päring "EE" tsoonist
+- Ülekandetariifide öö/päev/nädalapäev ajastus vastavalt Elektrilevi tingimustele. Kui KM on määratud, siis see lisatakse tasudele.
+- Uue hinnainfo päring toimub pärast 18:00. Lisatud on juhuslik viivitus 0-15 min, et kõik kliendid ei saadaks päringut Eleringi serverile samal minutil. Kui hinnaandmed on puudu/valed, siis loodetavasti on need selleks ajaks juba korrigeeritud. Pärast keskööd kopeeritakse järgmise päeva hinnad samale päevale.
+- Kasutajaliides on eesti keeles
 
 # Suomeksi
 ## [2.13.0] - 14.07.2024

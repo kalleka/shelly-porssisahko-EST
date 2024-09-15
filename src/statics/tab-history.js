@@ -4,7 +4,8 @@
  * (c) Jussi isotalo - http://jisotalo.fi
  * https://github.com/jisotalo/shelly-porssisahko
  * 
- * License: GNU Affero General Public License v3.0 
+ * License: GNU Affero General Public License v3.0
+ * Modified by Kalle Kaljuste 2024-08-03
  */
 {
   let prevHistoryTs = 0;
@@ -28,8 +29,8 @@
         for (let row of d.h) {
           let data = `<tr>`;
           data += `<td class="fit">${formatTime(new Date(row[0] * 1000))}</td>`;
-          data += `<td style="color:${row[1] ? `green` : `red`}">${row[1] ? `Ohjaus päälle` : `Ohjaus pois`}</td>`;
-          data += `<td>${STATE_STR[row[2]]?.replace(" (%s asti)", "")}</td>`;
+          data += `<td style="color:${row[1] ? `green` : `red`}">${row[1] ? `Sisselülitus` : `Väljalülitus`}</td>`;
+          data += `<td>${STATE_STR[row[2]]?.replace(" (kuni %s)", "")}</td>`;
           data += `</tr>`;
 
           qs("#s-hist").innerHTML += data;

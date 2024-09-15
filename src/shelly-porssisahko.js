@@ -7,6 +7,7 @@
  * https://github.com/jisotalo/shelly-porssisahko
  * 
  * License: GNU Affero General Public License v3.0 
+ * Modified by Kalle Kaljuste 2024-09-09
  */
 
 /** Number of history rows */
@@ -61,7 +62,7 @@ let C_DEF = {
     cnt2: 0,
   },
   /** VAT added to spot price [%] */
-  vat: 24,
+  vat: 22,
   /** Day (07...22) transfer price [c/kWh] */
   day: 0,
   /** Night (22...07) transfer price [c/kWh] */
@@ -88,7 +89,7 @@ let C_DEF = {
 let _ = {
   s: {
     /** version number */
-    v: "2.13.0",
+    v: "0.1.0-2.13.0",
     /** Device name */
     dn: '',
     /** status as number */
@@ -117,7 +118,9 @@ let _ = {
     tz: "+02:00",
     /** Active time zone hour difference*/
     tzh: 0,
-    /** price info [0] = today, [1] = tomorrow */
+	/** Random delay for server requests (max 15min)*/
+	delay: Math.floor(Math.random() * 16),
+	/** price info [0] = today, [1] = tomorrow */
     p: [
       {
         /** time when prices were read */
@@ -346,7 +349,7 @@ function chkConfig(cb) {
   if (count > 0) {
     Shelly.call("KVS.Set", { key: "porssi-config", value: _.c }, function (res, err, msg, cb) {
       if (err !== 0) {
-        log("chkConfig() - virhe:" + err + " - " + msg);
+        log("chkConfig() - error:" + err + " - " + msg);
       }
       if (cb) {
         cb(err === 0);
@@ -418,7 +421,7 @@ function loop() {
 
   } catch (err) {
     //Shouldn't happen
-    log("loop() - virhe:" + err);
+    log("loop() - error:" + err);
     loopRunning = false;
   }
 }
@@ -436,10 +439,11 @@ function pricesNeeded(dayIndex) {
     /*
     Getting prices for tomorrow if
       - we have a valid time
-      - clock is past 15:00 local time (NOTE: Elering seems to have prices after 14.30 LOCAL time, no matter is it DST or not)
+      - clock is past 18:00 local time (NOTE: Elering seems to have prices after 14.30 LOCAL time, no matter is it DST or not)
       - we don't have prices
+	Add some random minutes to spread out the server requests
     */
-    res = _.s.timeOK && _.s.p[1].ts === 0 && now.getHours() >= 15;
+    res = _.s.timeOK && _.s.p[1].ts === 0 && ((now.getHours() === 18 && now.getMinutes() >= _.s.delay) || now.getHours() > 18);
 
   } else {
     /*
@@ -450,11 +454,12 @@ function pricesNeeded(dayIndex) {
     let dateChanged = getDate(new Date(_.s.p[0].ts * 1000)) !== getDate(now);
 
     //Clear tomorrow data
-    if (dateChanged) {
+    /*
+	if (dateChanged) {
       _.s.p[1].ts = 0;
       _.p[1] = [];
     }
-
+	*/
     /*
     -----------------
     The following commented code moves tomorrow prices to today
@@ -462,7 +467,7 @@ function pricesNeeded(dayIndex) {
 
     If using this, comment out the if (dateChanged) { ... } above
     -----------------
-
+	*/
     if (dateChanged && _.s.p[1].ts > 0 && getDate(new Date(_.s.p[1].ts * 1000)) !== getDate(now)) {
       //Copy tomorrow data
       _.p[0] = _.p[1];
@@ -477,7 +482,6 @@ function pricesNeeded(dayIndex) {
       //No need to fetch from server
       dateChanged = false;
     }
-    */
 
     res = _.s.timeOK && (_.s.p[0].ts == 0 || dateChanged);
   }
@@ -550,7 +554,7 @@ function getPrices(dayIndex) {
     let end = start.replace("T00:00:00", "T23:59:59");
 
     let req = {
-      url: "https://dashboard.elering.ee/api/nps/price/csv?fields=fi&start=" + start + "&end=" + end,
+      url: "https://dashboard.elering.ee/api/nps/price/csv?fields=ee&start=" + start + "&end=" + end,
       timeout: 5,
       ssl_ca: "*"
     };
@@ -562,13 +566,15 @@ function getPrices(dayIndex) {
 
     Shelly.call("HTTP.GET", req, function (res, err, msg) {
       req = null;
-
+	  
       try {
         if (err === 0 && res != null && res.code === 200 && res.body_b64) {
           //Clearing some fields to save memory
           res.headers = null;
           res.message = null;
           msg = null;
+
+		  //log("We got market prices from Elering");
 
           _.p[dayIndex] = [];
           _.s.p[dayIndex].avg = 0;
@@ -608,14 +614,15 @@ function getPrices(dayIndex) {
             row[1] = row[1] / 10.0 * (100 + (row[1] > 0 ? _.c.vat : 0)) / 100.0;
 
             //Add transfer fees (if any)
+			//Use Elektrilevi schedules, add VAT
             let hour = new Date(row[0] * 1000).getHours();
-
-            if (hour >= 7 && hour < 22) {
-              //day
-              row[1] += _.c.day;
-            } else {
+            let day = new Date(row[0] * 1000).getDay();
+            if (day === 6 || day === 0 || hour < 7 || hour >= 22) {
               //night
-              row[1] += _.c.night;
+              row[1] += ((100 + _.c.vat) * _.c.night) / 100;
+            } else {
+              //day
+              row[1] += ((100 + _.c.vat) * _.c.day) / 100;
             }
 
             //Adding and calculating stuff
@@ -646,16 +653,16 @@ function getPrices(dayIndex) {
             //Let's assume that if we have data for at least 23 hours everything is OK
             //This should take DST saving changes in account
             //If we get less the prices may not be updated yet to elering API?
-            throw new Error("huomisen hintoja ei saatu");
+            throw new Error("tomorrow's prices not obtained");
           }
 
 
         } else {
-          throw new Error("virhe: " + err + "(" + msg + ") - " + JSON.stringify(res));
+          throw new Error("error: " + err + "(" + msg + ") - " + JSON.stringify(res));
         }
 
       } catch (err) {
-        log("getPrices() - virhe:" + err);
+        log("getPrices() - error:" + err);
         _.s.errCnt += 1;
         _.s.errTs = epoch();
 
@@ -673,7 +680,7 @@ function getPrices(dayIndex) {
     });
 
   } catch (err) {
-    log("getPrices() - virhe:" + err);
+    log("getPrices() - error:" + err);
     _.s.p[dayIndex].ts = 0;
     _.p[dayIndex] = [];
 
@@ -699,7 +706,7 @@ function setRelay(output, cb) {
 
   Shelly.call("Switch.Set", prm, function (res, err, msg, cb) {
     if (err != 0) {
-      log("setRelay() - ohjaus #" + output + " epäonnistui: " + err + " - " + msg);
+      log("setRelay() - switching #" + output + " failed: " + err + " - " + msg);
     }
 
     cb(err == 0);
@@ -813,7 +820,7 @@ function logic() {
 
       if (_.c.oc == 1 && _.s.cmd == cmd) {
         //No need to write 
-        log("logic(): lähtö on jo oikeassa tilassa");
+        log("logic(): output is already in required state");
         addHistory();
         _.s.cmd = cmd ? 1 : 0;
         _.s.chkTs = epoch();
@@ -855,7 +862,7 @@ function logic() {
     }
 
   } catch (err) {
-    log("logic() - virhe:" + JSON.stringify(err));
+    log("logic() - error:" + JSON.stringify(err));
     loopRunning = false;
   }
 }
@@ -1143,7 +1150,7 @@ function onServerRequest(request, response) {
       response.headers.push(["Content-Encoding", "gzip"]);
     }
   } catch (err) {
-    log("http - virhe:" + err);
+    log("http - error:" + err);
     response.code = 500;
   }
   response.send();

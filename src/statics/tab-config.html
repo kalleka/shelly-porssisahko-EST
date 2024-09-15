@@ -4,106 +4,107 @@
 * 
 * (c) Jussi isotalo - http://jisotalo.fi
 * https://github.com/jisotalo/shelly-porssisahko
+* Modified by Kalle Kaljuste 2024-08-27
 * 
 * License: GNU Affero General Public License v3.0 
 */
 -->
-<div class="tc b">YLEISET</div>
+<div class="tc b">ÜLDSEADED</div>
 <table class="m cc">
   <tr>
-    <td class="w180">Ohjaustapa</td>
+    <td class="w180">Juhtimismeetod</td>
     <td>
       <select id="mode">
       </select>
     </td>
   </tr>
   <tr>
-    <td>Ohjattavat lähdöt</td>
+    <td>Juhitava väljundi ID</td>
     <td>
       <input type="text" id="outs" size="4">
     </td>
   </tr>
   <tr>
-    <td>Lähdön ohjaus</td>
+    <td>Väljundi lülitamine</td>
     <td>
       <select id="oc">
-        <option value="0">Aina tarkistaessa</option>
-        <option value="1">Vain muuttuessa</option>
+        <option value="0">Alati oleku kontrollimisel</option>
+        <option value="1">Ainult oleku muutumisel</option>
       </select>
     </td>
   </tr>
   <tr>
-    <td>Ohjausminuutit</td>
+    <td>Lülitusperiood</td>
     <td>
       <input type="text" id="min" size="2"> min
     </td>
   </tr>
   <tr>
-    <td>Käänteinen ohjaus</td>
+    <td>Vastupidine lülitus</td>
     <td>
       <input type="checkbox" id="inv">
     </td>
   </tr>
   <tr>
-    <td>Sähkön ALV</td>
+    <td>Käibemaksu määr</td>
     <td>
       <input type="text" id="vat" size="2"> %
     </td>
   </tr>
   <tr>
-    <td>Siirtomaksut</td>
+    <td>Ülekandetasud</td>
     <td>
-      07-22: <input type="text" id="day" size="2"> c/kWh
+      päeval: <input type="text" id="day" size="2"> c/kWh (ilma KM´ta)
       <div class="mt10">
-        22-07: <input type="text" id="night" size="2"> c/kWh
+      &ensp;öösel: <input type="text" id="night" size="2"> c/kWh (ilma KM´ta)
       </div>
     </td>
   </tr>
   <tr>
-    <td>Varmuustunnit</td>
+    <td>Lülitus hinnainfo puudumisel</td>
     <td id="bk"></td>
   </tr>
   <tr>
-    <td>Hätätilaohjaus</td>
+    <td>Rikkekaitse</td>
     <td>
       <input type="checkbox" id="err"> <label for="err">ON/OFF</label>
     </td>
   </tr>
   <tr>
-    <td>Pakko-ohjaukset</td>
+    <td>Määratud tunnid</td>
     <td>
       <details class="ml5">
-        <summary>Näytä/piilota</summary>
+        <summary>Näita/peida</summary>
         <table id="fh" class="sm mt10"></table>
       </details>
     </td>
   </tr>
 </table>
 
-<div class="tc mt10 b">KÄSIOHJAUS</div>
+<div class="tc mt10 b">JUHTIMISMEETOD - KÄSITSI LÜLITAMINE</div>
 <table class="m cc">
   <tr>
-    <td class="w180">Ohjaus</td>
+    <td class="w180">Väljundi olek</td>
     <td>
       <input type="checkbox" id="m0-cmd"> <label for="m0-cmd">ON/OFF</label>
     </td>
   </tr>
 </table>
 
-<div class="tc mt10 b">HINTARAJA</div>
+<div class="tc mt10 b">JUHTIMISMEETOD - HINNAPIIR</div>
 <table class="m cc">
   <tr>
-    <td class="w180">Hintaraja</td>
+    <td class="w180">Hind</td>
     <td>
-      <input type="text" id="m1-lim" size="2"> c/kWh
+      &le; <input type="text" id="m1-lim" size="2"> c/kWh või keskmine - "avg"
     </td>
   </tr>
 </table>
 
-<div class="tc mt10 b">JAKSON HALVIMMAT TUNNIT</div>
+<div class="tc mt10 b">JUHTIMISMEETOD - PERIOODI SOODSAIMAD TUNNID</div>
 <table class="m cc">
   <tr>
-    <td class="w180">Ajanjakso</td>
+    <td class="w180">Periood</td>
     <td>
       <select id="m2-per">
         <option value="24">24h</option>
@@ -113,66 +114,66 @@
         <option value="4">4h</option>
         <option value="3">3h</option>
         <option value="2">2h</option>
-        <option value="-1">oma valinta (1 jakso)</option>
-        <option value="-2">oma valinta (2 jaksoa)</option>
+        <option value="-1">oma valik (1 periood)</option>
+        <option value="-2">oma valik (2 perioodi)</option>
       </select>
 
       <span class="h">
-        aikaväli (klo):
+        ajavahemik
       </span>
     </td>
   </tr>
   <tr class="m2-c">
-    <td>Oma ajanjakso</td>
+    <td>Oma ajavahemik 1</td>
     <td>
       <input type="text" id="m2-ps" size="2">:00 - <input type="text" id="m2-pe" size="2">:00
     </td>
   </tr>
   <tr>
-    <td>Tuntimäärä</td>
+    <td>Tundide arv 1</td>
     <td>
       <input type="text" id="m2-cnt" size="2"> h
     </td>
   </tr>
   <tr class="m2-c2">
-    <td>Oma ajanjakso 2</td>
+    <td>Oma ajavahemik 2</td>
     <td>
       <input type="text" id="m2-ps2" size="2">:00 - <input type="text" id="m2-pe2" size="2">:00
     </td>
   </tr>
   <tr class="m2-c2">
-    <td>Tuntimäärä 2</td>
+    <td>Tundide arv 2</td>
     <td>
       <input type="text" id="m2-cnt2" size="2"> h
     </td>
   </tr>
   <tr>
-    <td>Peräkkäiset</td>
+    <td>Järjestikused</td>
     <td>
       <input type="checkbox" id="m2-sq">
     </td>
   </tr>
   <tr>
-    <td>Aina päällä -raja</td>
+    <td>"Alati sees" hind</td>
     <td>
-      <input type="text" size="2" id="m2-lim"> c/kWh
+      &le; <input type="text" size="2" id="m2-lim"> c/kWh või keskmine - "avg"
     </td>
   </tr>
   <tr>
-    <td>Maksimihinta</td>
+    <td>"Alati väljas" hind</td>
     <td>
-      <input type="text" size="2" id="m2-m"> c/kWh
+      &ge; <input type="text" size="2" id="m2-m"> c/kWh või keskmine - "avg"
     </td>
   </tr>
 </table>
 <div class="tc mt10">
-  <input id="save" type="button" value="Tallenna">
+  <input id="save" type="button" value="Salvesta">
 </div>
 
-<div class="tc mt10 b">TOIMINNOT</div>
+<div class="tc mt10 b">TOIMINGUD</div>
 <div class="tc">
-  <input class="mt10" type="button" id="force" value="Pakko-ohjaus"><br>
-  <input class="mt10" type="button" onclick="window.open(`/`)" value="Shellyn hallinta">
+  <input class="mt10" type="button" id="force" value="Ühekordne lülitus"><br>
+  <input class="mt10" type="button" onclick="window.open(`/`)" value="Shelly seaded">
 </div>
 
 <script>

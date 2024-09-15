@@ -5,7 +5,8 @@
 * (c) Jussi isotalo - http://jisotalo.fi
 * https://github.com/jisotalo/shelly-porssisahko
 * 
-* License: GNU Affero General Public License v3.0 
+* License: GNU Affero General Public License v3.0
+* Modified by Kalle Kaljuste 2024-08-03
 */
 -->
 <!DOCTYPE html>
@@ -13,13 +14,13 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Pörssisähkö</title>
+  <title>Börsielekter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
   <div class="top">
-    <div id="title">Pörssisähkö</div>
+    <div id="title">Börsielekter</div>
     <div id="spin" class="spn"></div>
     <div id="copy">&copy; Jussi Isotalo (<a href="https://jisotalo.fi" target="_blank">jisotalo.fi</a>)</div>
   </div>
@@ -27,17 +28,17 @@
   <div class="tabs">
     <div class="tab">
       <input type="radio" name="a" id="tab-status" checked class="ts">
-      <label for="tab-status" class="tab-label">Tila</label>
+      <label for="tab-status" class="tab-label">Ülevaade</label>
       <div class="tab-content" id="c-tab-status"></div>
     </div>
     <div class="tab">
       <input type="radio" name="a" id="tab-history" class="ts">
-      <label for="tab-history" class="tab-label">Historia</label>
+      <label for="tab-history" class="tab-label">Ajalugu</label>
       <div class="tab-content" id="c-tab-history"></div>
     </div>
     <div class="tab">
       <input type="radio" name="a" id="tab-config" class="ts">
-      <label for="tab-config" class="tab-label">Asetukset</label>
+      <label for="tab-config" class="tab-label">Seaded</label>
       <div class="tab-content" id="c-tab-config"></div>
     </div>
   </div>

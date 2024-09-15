@@ -3,7 +3,10 @@
 [![GitHub](https://img.shields.io/badge/View%20on-GitHub-brightgreen)](https://github.com/jisotalo/shelly-porssisahko)
 [![Support](https://img.shields.io/badge/Support_with-PayPal-yellow)](https://www.paypal.com/donate/?business=KUWBXXCVGZZME&no_recurring=0&currency_code=EUR)
  
- 
+## Muudatused - kohandatud EE hinnapiirkonnale
+* Vaata täpsemalt muudatuste logi
+* Kasutamiseks paigalda "shelly-porssisahko.js"  skript mis asub "dist" kaustas
+* -----------------------------------
 
 Shelly-laitteisiin selaimella ohjattava ilmainen ja avoimen lähdekoodin pörssisähkösovellus. Skripti pyörittää käyttöliittymää omalla web-serverillä ja tallentaa asetukset Shellyn muistiin.
 
