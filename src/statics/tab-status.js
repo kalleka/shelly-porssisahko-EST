@@ -4,12 +4,13 @@
  * (c) Jussi isotalo - http://jisotalo.fi
  * https://github.com/jisotalo/shelly-porssisahko
  * 
- * License: GNU Affero General Public License v3.0 
+ * License: GNU Affero General Public License v3.0
+ * Modified by Kalle Kaljuste 2024-08-03 
  */
 {
   let priceListsUpdated = [0, 0];
   let priceListActiveHour = -1;
-  let notYetKnown = `<tr><td colspan="3">Ei vielä tiedossa</td></tr>`;
+  let notYetKnown = `<tr><td colspan="3">Hetkel teadmata</td></tr>`;
 
   const onUpdate = async () => {
     try {
@@ -25,30 +26,30 @@
       let c = d.c;
 
       let todayPricesOK = d.p.length > 0;
-      document.title = `${(s.dn ? `${s.dn} - ` : '')}Pörssisähkö`;
+      document.title = `${(s.dn ? `${s.dn} - ` : '')}Börsielekter`;
 
-      qs("#s-cmd").innerHTML = s.cmd ? "PÄÄLLÄ" : "POIS";
+      qs("#s-cmd").innerHTML = s.cmd ? "SEES" : "VÄLJAS";
       qs("#s-cmd").style.color = s.cmd ? "green" : "red";
       qs("#s-mode").innerHTML = MODE_STR[c.mode];
-      qs("#s-dn").innerHTML = s.dn ? s.dn : '<i>Ei asetettu</i>';
+      qs("#s-dn").innerHTML = s.dn ? s.dn : '<i>Pole seadistatud</i>';
       qs("#s-now").innerHTML = todayPricesOK ? `${s.p[0].now.toFixed(2)} c/kWh` : "";
       qs("#s-st").innerHTML = (s.st === 9
         ? STATE_STR[s.st].replace("%s", formatDateTime(new Date(s.fCmdTs * 1000), false))
-        : STATE_STR[s.st]) + (c.inv ? " (käänteinen)" : "");
+        : STATE_STR[s.st]) + (c.inv ? " (vastupidine)" : "");
 
       if (s.str != "") {
         qs("#s-st").innerHTML += `<br><br>${s.str}`;
       }
 
-      qs("#s-info").innerHTML = `${s.chkTs > 0 ? `Ohjaus tarkistettu ${formatTime(new Date(s.chkTs * 1000))}` : `Tarkistetaan ohjausta...`} - ${s.p[0].ts > 0 ? `Hinnat päivitetty ${formatTime(new Date(Math.max(s.p[0].ts, s.p[1].ts) * 1000))}` : "Hintoja haetaan..."}`;
-      qs("#s-v").innerHTML = `Käynnistetty ${formatDateTime(new Date(s.upTs * 1000))} (käynnissä ${((new Date().getTime() - new Date(s.upTs * 1000).getTime()) / 1000.0 / 60.0 / 60.0 / 24.0).toFixed("1")} päivää) - versio ${s.v}`;
+      qs("#s-info").innerHTML = `${s.chkTs > 0 ? `Väljundi olek kontrollitud ${formatTime(new Date(s.chkTs * 1000))}` : `Kontrollime olekut...`} - ${s.p[0].ts > 0 ? `Hinnad uuendatud ${formatTime(new Date(Math.max(s.p[0].ts, s.p[1].ts) * 1000))}` : "Uuendame hindu..."}`;
+      qs("#s-v").innerHTML = `Käivitatud ${formatDateTime(new Date(s.upTs * 1000))} (käigus ${((new Date().getTime() - new Date(s.upTs * 1000).getTime()) / 1000.0 / 60.0 / 60.0 / 24.0).toFixed("1")} päeva) - versioon ${s.v}`;
 
 
       /**
        * Helper that builds price info table for today or tomorrow
        */
       const buildPriceTable = (priceInfo, elementId) => {
-        let header = `<tr><td class="t bg">Keskiarvo</td><td class="t bg">Halvin</td><td class="t bg">Kallein</td></tr>`;
+        let header = `<tr><td class="t bg">Keskmine</td><td class="t bg">Soodsaim</td><td class="t bg">Kalleim</td></tr>`;
 
         if (priceInfo.ts == 0) {
           return `${header}${notYetKnown}`;
@@ -69,7 +70,7 @@
        * Helper that builds price/cmd table for today or tomorrow 
        */
       const buildPriceList = (dayIndex, element) => {
-        let header = ` <tr><td class="t bg">Aika</td><td class="t bg">Hinta</td><td class="t bg">Ohjaus</td></tr>`;
+        let header = ` <tr><td class="t bg">Aeg</td><td class="t bg">Hind</td><td class="t bg">Lülitus</td></tr>`;
         //Get cheapest hours
 
         //This is (and needs to be) 1:1 in both frontend and backend code
@@ -225,7 +226,7 @@
     } catch (err) {
       console.error(err);
       let c = (e) => qs(e).innerHTML = "";
-      qs("#s-cmd").innerHTML = "Tila ei tiedossa";
+      qs("#s-cmd").innerHTML = "Info puudub";
       qs("#s-cmd").style.color = "red";
       c("#s-dn");
       c("#s-now");

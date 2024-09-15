@@ -5,6 +5,7 @@
  * https://github.com/jisotalo/shelly-porssisahko
  * 
  * License: GNU Affero General Public License v3.0 
+ * Modified by Kalle Kaljuste 2024-09-09
  */
 /** URL of the shelly (only if DEV active, otherwise it is same origin) */
 let URL = "";
@@ -24,29 +25,29 @@ let DBG = () => { };
  * Enumeration of state
  */
 let STATE_STR = [
-  "Käynnistetään", //0
-  "Käsiohjaus", //1
-  "Hinta alle rajan", //2
-  "Hinta yli rajan", //3
-  "Hinta ei halvimpia tällä ajanjaksolla", //4
-  "Hinta halvimpia tällä ajanjaksolla", //5
-  "Hinta alle aina päällä -rajan", //6
-  "Varmuustuntiohjaus (ei hintoja, aika tiedossa)", //7
-  "Hätätilaohjaus (aika ei tiedossa)", //8
-  "Pakko-ohjaus (%s asti)", //9
-  "Pakko-ohjattu tunti", //10
-  "Hinta yli maksimirajan", //11
-  "Käyttäjän skriptiohjaus ylikirjoittaa", //12
-  "Tunnin ohjausminuutit käytetty" //13
+  "Käivitamine", //0
+  "Käsitsi lülitamine", //1
+  "Hind alla piirmäära", //2
+  "Hind üle piirmäära", //3
+  "Hind ei ole sellel perioodil soodsaim", //4
+  "Hind on sellel perioodil soodsaim", //5
+  "Hind soodsam kui \"alati sees\" piirmäär", //6
+  "Lülitus hinnainfo puudumisel (kell paigas)", //7
+  "Rikkekaitse (Shelly kellaaeg teadmata)", //8
+  "Käsitsi lülitatus (kuni %s)", //9
+  "Käsitsi määratud tund", //10
+  "Hind üle maksimumpiiri", //11
+  "Kasutaja lisaskripti poolt seatud", //12
+  "Määratud lülitusminutid läbi" //13
 ]
 
 /**
  * Enumeration of mode
  */
 let MODE_STR = [
-  "Käsiohjaus",
-  "Hintaraja",
-  "Jakson halvimmat tunnit"
+  "Käsitsi lülitamine",
+  "Hinnapiir",
+  "Perioodi soodsaimad tunnid"
 ]
 
 /**

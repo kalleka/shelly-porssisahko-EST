@@ -5,6 +5,7 @@
  * https://github.com/jisotalo/shelly-porssisahko
  * 
  * License: GNU Affero General Public License v3.0 
+ * Modified by Kalle Kaljuste 2024-08-03
  */
 {
   let configRead = false;
@@ -44,7 +45,7 @@
       qs("#bk").innerHTML = hours.replaceAll("X", "b");
 
       //Forced hours
-      let fh = `<tr><td>Tunti</td><td>OFF</td><td>-</td><td>ON</td></tr>`;
+      let fh = `<tr><td>Tund</td><td>OFF</td><td>auto</td><td>ON</td></tr>`;
       for (let i = 0; i < 24; i++) {
         fh += `<tr><td>${("" + i).padStart(2, "0")}</td>${radioRow(`X${i}`, 0)}${radioRow(`X${i}`, -1)}${radioRow(`X${i}`, 1)}</tr>`;
       }
@@ -139,34 +140,34 @@
       if (res.code == 200) {
         getData(`${URLS}?r=r`)
           .then(res => {
-            alert(`Tallennettu!`);
+            alert(`Salvestatud!`);
             configRead = false;
           })
           .catch(err => {
-            alert(`Virhe: ${err})`);
+            alert(`Viga: ${err})`);
           });
 
       } else {
-        alert(`Virhe: ${res.txt})`);
+        alert(`Viga: ${res.txt})`);
       }
     } catch (err) {
-      alert("Virhe: " + err.message);
+      alert("Viga: " + err.message);
     }
   };
 
   let force = async () => {
-    let hours = prompt("Pakko-ohjauksen kesto tunteina? (0 = peru nykyinen)");
+    let hours = prompt("Käsitsi lülituse kestus tundides? (0 = tühista praegune)");
     
     if (hours != null) {
       hours = Number(hours);
 
-      let cmd = hours > 0 ? parseInt(prompt("Pakko-ohjataanko ohjaus päälle (1) vai pois (0)?", "1")) : 0;
+      let cmd = hours > 0 ? parseInt(prompt("Käsitsi lülitus SISSE (1) või VÄLJA (0)?", "1")) : 0;
       if (isNaN(cmd)) {
         return;
       }
 
       let res = await getData(`${URLS}?r=f&ts=${hours > 0 ? Math.floor(Date.now() / 1000 + hours * 60 * 60) : 0}&c=${cmd}`);
-      alert(res.code == 204 ? "OK!" : `Virhe: ${res.txt}`);
+      alert(res.code == 204 ? "OK!" : `Viga: ${res.txt}`);
     }
   }
 

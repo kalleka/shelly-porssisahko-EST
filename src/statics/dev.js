@@ -9,10 +9,10 @@
  * This file is loaded only during local development
  */
 /** URL of the shelly */
-URL = "http://192.168.68.100";
+URL = "";
 
 /** URL of the logic script */
-URLS = `${URL}/script/1`;
+URLS = ``;
 
 /**
  * debug function that is printing to console only when DEV is active
