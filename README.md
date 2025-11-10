@@ -2,7 +2,14 @@
 [![License](https://img.shields.io/badge/License-AGPLv3-orange)](https://choosealicense.com/licenses/agpl-3.0/)
 [![GitHub](https://img.shields.io/badge/View%20on-GitHub-brightgreen)](https://github.com/jisotalo/shelly-porssisahko-en)
 
-*Pörssisähkö: a Finnish word for electric spot price*
+## Muudatused - kohandatud EE hinnapiirkonnale
+* Vaata täpsemalt muudatuste logi
+* Kasutamiseks paigalda "shelly-porssisahko.js"  skript mis asub "dist" kaustas
+* -----------------------------------
+## Adopted for EE price region
+* Check the changelog for explanation of the changes made
+  
+* ----------------------------------- *Pörssisähkö: a Finnish word for electric spot price*
 
 A free open source script for Shelly devices to control outputs by Nordpool electricity spot price. Script runs its own web server and saves its settings to Shelly's memory. Fully configured and monitored using a web browser.
 
