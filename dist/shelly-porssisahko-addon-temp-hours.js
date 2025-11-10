@@ -15,26 +15,51 @@ const CNST={INST_COUNT:"undefined"==typeof INSTANCE_COUNT?3:INSTANCE_COUNT,HIST_
 //end
 
 /**
- * Tämä käyttäjäskripti ylikirjoittaa 1. ohjauksen lähdön tarvittaessa
+ * Tämä käyttäjäskripti muuttaa 1. ohjauksen asetuksia
  * Shelly Plus Add-onin mittaaman lämpötilan perusteella.
  * 
- * Idea on, että jos lämpötila on tarpeeksi korkea, ei ohjata turhaan.
- * Ja jos lämpötila onkin liian matala, ohjataan vaikka olisi kallista.
- * 
- * Muuten mennään pörssiohjauksen mukaan.
+ * Mitä kylmempi lämpötila, sitä useampi halvempi tunti ohjataan 
+ * ja samalla myös ohjausminuuttien määrää kasvatetaan.
  */
-function USER_OVERRIDE(inst, cmd, callback) {
-  //Otetaan tila talteen
-  const state = _;
-  
-  //Jos kyseessä on joku muu ohjaus kuin #1 niin ei tehdä mitään
-  if (inst != 0) {
-    callback(cmd);
+//Mitä ohjausta hienosäädetään (0 = ohjaus #1, 1 = ohjaus #2 jne.)
+let INSTANCE = 0;
+
+//Alkuperäiset muokkaamattomat asetukset
+let originalConfig = {
+  hours: 0,
+  minutes: 60
+};
+
+function USER_CONFIG(inst, initialized) {
+  //Jos kyseessä on jonkun muun asetukset niin ei tehdä mitään
+  if (inst != INSTANCE) {
     return;
   }
 
+  //Vähän apumuuttujia
+  const state = _;
+  const config = state.c.i[inst];
+
+  //Jos asetuksia ei vielä ole, skipataan (uusi asennus)
+  if (typeof config.m2 == "undefined") {
+    console.log("Tallenna asetukset kerran käyttäjäskriptiä varten");
+    return;
+  }
+
+  //Tallenentaan alkuperäiset asetukset muistiin
+  if (initialized) {
+    originalConfig.hours = config.m2.c;
+    originalConfig.minutes = config.m;
+
+    console.log("Alkuperäiset asetukset:", originalConfig);
+  }
+
+  //Käytetää lähtökohtaisesti alkuperäisiin asetuksiin tallennettua tuntimäärää ja ohjausminuutteja
+  //Näin ollen jos tallentaa asetukset käyttöliittymältä, tulee ne myös tähän käyttöön
+  let hours = originalConfig.hours;
+  let minutes = originalConfig.minutes;
+
   try {
-    //console.log("Suoritetaan USER_OVERRIDE. Ohjauksen tila ennen: ", cmd);
     let temp = Shelly.getComponentStatus("temperature:100");
 
     if (!temp) {
@@ -47,26 +72,41 @@ function USER_OVERRIDE(inst, cmd, callback) {
       throw new Error("Onko anturi kytketty?");
     }
 
-    if (cmd && temp.tC > 15) {
-      state.si[inst].str = "Lämpötila " + temp.tC + "°C on yli 15°C -> ohjaus pois";
-      console.log("Lämpötila on yli 15 astetta, asetetaan ohjaus pois. Lämpötila nyt:", temp.tC);
-      cmd = false;
+    //------------------------------
+    // Toimintalogiikka
+    // muokkaa haluamaksesi
+    //------------------------------
 
-    } else if (!cmd && temp.tC < 5) {
-      state.si[inst].str = "Lämpötila " + temp.tC + "°C on alle 5°C -> ohjaus päälle";
-      console.log("Lämpötila on alle 5 astetta, asetetaan ohjaus päälle. Lämpötila nyt:", temp.tC);
-      cmd = true;
+    //Muutetaan lämpötilan perusteella lämmitystuntien määrää ja minuutteja
+    if (temp.tC <= -15) {
+      hours = 8;
+      minutes = 60;
 
+    } else if (temp.tC <= -10) {
+      hours = 7;
+      minutes = 45;
+
+    } else if (temp.tC <= -5) {
+      hours = 6;
+      minutes = 45;
+      
     } else {
-      state.si[inst].str = "Lämpötila " + temp.tC + "°C -> mennään ohjauksen mukaan";
-    }
-    
-    //console.log("USER_OVERRIDE suoritettu. Ohjauksen tila nyt: ", cmd);
-    callback(cmd);
+      //Ei tehdä mitään --> käytetään käyttöliittymän asetuksia
+    } 
+
+    //------------------------------
+    // Toimintalogiikka päättyy
+    //------------------------------
+    state.si[inst].str = "Lämpötila " + temp.tC.toFixed(1) + "°C -> halvat tunnit: " + hours + " h, ohjaus: " + minutes + " min";
+    console.log("Lämpötila:", temp.tC.toFixed(1), "°C -> asetettu halvimpien tuntien määräksi ", hours, "h ja ohjausminuuteiksi", minutes, "min");
+
 
   } catch (err) {
-    console.log("Virhe tapahtui USER_OVERRIDE-funktiossa. Virhe:", err);
-    state.si[inst].str = "Lämpötilaohjauksen virhe:" + err;
-    callback(cmd);
+    state.si[inst].str = "Virhe lämpötilaohjauksessa:" + err;
+    console.log("Virhe tapahtui USER_CONFIG-funktiossa. Virhe:", err);
   }
+
+  //Asetetaan arvot asetuksiin
+  config.m2.c = hours;
+  config.m = minutes;
 }
